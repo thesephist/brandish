@@ -1,14 +1,36 @@
 body {
-    margin: 24px auto;
-    width: calc(100% - 36px);
-    min-width: 400px;
-    max-width: 800px;
+    margin: 0;
+    font-family: system-ui, sans-serif;
 }
 
 @media only screen and (max-width: 700px) {
     body {
         min-width: unset;
     }
+}
+
+section {
+    width: 100%;
+    padding: 24px 0;
+}
+
+section.hero {
+    background: var(--color-primary);
+    color: #f8f8f8;
+    padding: 100px 0;
+}
+
+.hero h1 {
+    font-size: 3.6em;
+    margin: 0;
+    margin-bottom: 24px;
+}
+
+.section-body {
+    padding: 0 24px;
+    min-width: 400px;
+    max-width: 720px;
+    margin: 0 84px;
 }
 
 .heading-group {

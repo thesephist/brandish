@@ -83,7 +83,7 @@ class RangeSlider extends StyledComponent {
         this.record.update({[this.name]: ~~(delta / this.incrementX) + this.initialV});
     }
     styles() {
-        const r = css`
+        return css`
         margin-bottom: 32px;
 
         .labels {
@@ -116,10 +116,8 @@ class RangeSlider extends StyledComponent {
             height: 16px;
             width: 16px;
             border-radius: 8px;
-            background: var(--fore);
             box-shadow: 0 3px 6px -1px rgba(0, 0, 0, .3);
             transition: transform .2s;
-            border: 2px solid var(--primary);
             transform: scale(1.4);
 
             &:hover {
@@ -144,8 +142,6 @@ class RangeSlider extends StyledComponent {
             background: var(--fore);
         }
         `;
-        console.log(r);
-        return r;
     }
     // TODO: probably have a hidden label + input here for a11y
     compose(data) {
@@ -161,7 +157,7 @@ class RangeSlider extends StyledComponent {
                 <div class="handle"
                     tabindex="1"
                     onmousedown=${this.onHandleDown}
-                    style="border-color:${data.base};left:calc(${pct}% - 8px)"
+                    style="background:#${data.base};left:calc(${pct}% - 8px)"
                 ></div>
             </div>
             <div class="clickPoints">
@@ -186,12 +182,37 @@ class ColorSwatch extends StyledComponent {
     styles() {
         return css`
         cursor: pointer;
-        background: ${this.color};
         height: 64px;
         width: 64px;
         border-radius: 8px;
         margin-right: 12px;
         float: left;
+        transition: transform .3s;
+        transform: none;
+        position: relative;
+
+        color: var(--fore);
+        line-height: 64px;
+        text-align: center;
+
+        &.active {
+            box-shadow: 0 0 4px 2px var(--fore);
+        }
+
+        &:hover {
+            transform: translateY(-4px);
+        }
+
+        input[type="color"] {
+            height: 100%;
+            width: 100%;
+            display: block;
+            opacity: 0;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
         `;
     }
     handleClick(evt) {
@@ -199,14 +220,21 @@ class ColorSwatch extends StyledComponent {
             base: this.color,
         });
     }
-    compose() {
-        return jdom`<div class="swatch" onclick="${this.handleClick}">
+    compose({base}) {
+        let bg = '#' + this.color;
+        if (this.editable) {
+            bg = `linear-gradient(-45deg, red, yellow, green, blue)`;
+        }
+
+        return jdom`<div class="swatch ${this.color === base ? 'active' : ''}" onclick="${this.handleClick}"
+            style="background:${bg}">
             ${this.editable ? jdom`<input type="color" oninput="${evt => {
                 this.color = evt.target.value;
                 this.record.update({
-                    base: this.color,
+                    base: this.color.substr(1),
                 });
             }}"/>` : null}
+            ${this.editable ? 'edit' : null}
         </div>`;
     }
 }
@@ -231,16 +259,16 @@ class ControlsPane extends StyledComponent {
             }),
         ];
         this.swatches = [
-            'red',
-            'blue',
-            'yellow',
-            'green',
+            '900',
+            '090',
+            '880',
+            '009',
         ].map(c => new ColorSwatch(record, {
             color: c,
             editable: false,
         }));
         this.swatches.push(new ColorSwatch(record, {
-            color: '#eee',
+            color: 'eee',
             editable: true,
         }));
 
@@ -251,35 +279,68 @@ class ControlsPane extends StyledComponent {
         box-sizing: border-box;
         height: 100%;
         width: 100%;
-        overflow: hidden;
+        overflow-y: auto;
         background: var(--back);
         color: var(--fore);
-        padding: 12px 20px;
+        padding: 12px 36px;
+        font-family: 'Source Sans Pro', sans-serif;
 
-        .question {
+        section {
+            margin-bottom: 84px;
+        }
+
+        .logo-link {
+            color: var(--fore);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .logo {
             font-size: 24px;
             font-weight: bold;
         }
 
-        .colorList {
-            overflow: hidden;
+        .controlsBody {
+            margin: 24px auto;
+            max-width: 500px;
+            margin-top: 64px;
+        }
+
+        .question {
+            font-size: 2.4em;
+            margin-bottom: 24px;
+        }
+
+        .colorRow {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
         }
         `;
     }
     compose() {
         return jdom`<div class="controlsPaneInner">
-            <header>
+            <a class="logo-link" href="/">
                 <div class="logo">brandish</div>
-            </header>
-            <div class="question">
-                How would you describe your brand?
-            </div>
-            ${this.sliders.map(s => s.node)}
-            <div class="question">
-                Which color best fits your brand?
-            </div>
-            <div class="colorList">
-                ${this.swatches.map(s => s.node)}
+            </a>
+            <div class="controlsBody">
+                <section>
+                    <div class="question">
+                        How would you describe your brand?
+                    </div>
+                    ${this.sliders.map(s => s.node)}
+                </section>
+                <section>
+                    <div class="question">
+                        Which color best fits your brand?
+                    </div>
+                    <div class="colorRow">
+                        ${this.swatches.map(s => s.node)}
+                    </div>
+                </section>
             </div>
         </div>`;
     }
@@ -338,9 +399,9 @@ function generateGuideCSS(data) {
     return `
     @import url('https://fonts.googleapis.com/css?family=${typeface.replace(' ', '+')}&display=swap');
     body {
-       --color-primary: ${data.base};
-       --color-secondary: ${data.base};
-       --color-tertiary: ${data.base};
+       --color-primary: #${data.base};
+       --color-secondary: #${data.base};
+       --color-tertiary: #${data.base};
        --font-primary: ${typeface};
        --font-secondary: ${typeface}
     }
@@ -359,6 +420,9 @@ function generateGuideCSS(data) {
 class PreviewPane extends StyledComponent {
     init(record) {
         this.lastStyles = '';
+        this.firstLoaded = false;
+
+        this.handleLoad = this.handleLoad.bind(this);
 
         this.bind(record, data => this.render(data));
     }
@@ -382,13 +446,18 @@ class PreviewPane extends StyledComponent {
         linkTag.innerHTML = stylesheet;
 
         const prev = doc.head.querySelector('style[data-brandish]');
-        console.log(prev);
         if (prev) {
             doc.head.removeChild(prev);
         }
         doc.head.appendChild(linkTag);
 
         this.lastStyles = stylesheet;
+    }
+    handleLoad() {
+        if (!this.firstLoaded) {
+            this.firstLoaded = true;
+            this.render();
+        }
     }
     styles() {
         return css`
@@ -406,7 +475,7 @@ class PreviewPane extends StyledComponent {
     compose(data) {
         this.updateGuideCSS();
         return jdom`<div class="previewPaneInner">
-            <iframe class="guide-frame" src="/guide" frameborder="0"></iframe>
+            <iframe onload="${this.handleLoad}" class="guide-frame" src="/guide" frameborder="0"></iframe>
         </div>`;
     }
 }
@@ -439,7 +508,7 @@ class App extends StyledComponent {
                     });
                     return;
                 default:
-                    router.go(`/${encodeGuideKey(state)}/colors/${state.base}/${secondary}/${state.tertiary}`);
+                    router.go(`/${encodeGuideKey(state)}/colors/${state.get('base')}/${state.get('secondary')}/${state.get('tertiary')}`);
                     return;
             }
         });
