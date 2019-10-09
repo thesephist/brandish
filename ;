@@ -53,9 +53,6 @@ class RangeSlider extends StyledComponent {
     value() {
         return this.record.data[this.name];
     }
-    handleClick(evt) {
-        // TODO: handle click anywhere in the bar.
-    }
     onHandleDown(evt) {
         evt.preventDefault();
         const handle = evt.target;
@@ -82,73 +79,8 @@ class RangeSlider extends StyledComponent {
         const delta = nowX - this.initialX;
         this.record.update({[this.name]: ~~(delta / this.incrementX) + this.initialV});
     }
-    styles() {
-        const r = css`
-        margin-bottom: 32px;
-
-        .labels {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1.4em;
-            font-weight: bold;
-        }
-
-        .sliderContainer {
-            position: relative;
-        }
-
-        .slider {
-            width: 100%;
-            height: 14px;
-            border-radius: 7px;
-            background: var(--fore);
-            margin: 16px 0;
-        }
-
-        .handle {
-            cursor: grab;
-            position: absolute;
-            top: calc(50% - 8px);
-            left: calc(50% - 8px);
-            box-sizing: border-box;
-            height: 16px;
-            width: 16px;
-            border-radius: 8px;
-            background: var(--fore);
-            box-shadow: 0 3px 6px -1px rgba(0, 0, 0, .3);
-            transition: transform .2s;
-            border: 2px solid var(--primary);
-            transform: scale(1.4);
-
-            &:hover {
-                transform: scale(1.5);
-            }
-            &:active {
-                cursor: grabbing;
-            }
-        }
-
-        .clickPoints {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .clickPoint {
-            height: 10px;
-            width: 10px;
-            border-radius: 5px;
-            background: var(--fore);
-        }
-        `;
-        console.log(r);
-        return r;
-    }
     // TODO: probably have a hidden label + input here for a11y
-    compose(data) {
+    compose() {
         const pct = (this.value() + 2) * 25;
 
         return jdom`<div class="rangeSlider">
@@ -161,7 +93,7 @@ class RangeSlider extends StyledComponent {
                 <div class="handle"
                     tabindex="1"
                     onmousedown=${this.onHandleDown}
-                    style="border-color:${data.base};left:calc(${pct}% - 8px)"
+                    style="left:calc(${pct}% - 8px)"
                 ></div>
             </div>
             <div class="clickPoints">
@@ -200,14 +132,7 @@ class ColorSwatch extends StyledComponent {
         });
     }
     compose() {
-        return jdom`<div class="swatch" onclick="${this.handleClick}">
-            ${this.editable ? jdom`<input type="color" oninput="${evt => {
-                this.color = evt.target.value;
-                this.record.update({
-                    base: this.color,
-                });
-            }}"/>` : null}
-        </div>`;
+        return jdom`<div class="swatch" onclick="${this.handleClick}"></div>`;
     }
 }
 
@@ -248,19 +173,6 @@ class ControlsPane extends StyledComponent {
     }
     styles() {
         return css`
-        box-sizing: border-box;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        background: var(--back);
-        color: var(--fore);
-        padding: 12px 20px;
-
-        .question {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
         .colorList {
             overflow: hidden;
         }
@@ -285,81 +197,16 @@ class ControlsPane extends StyledComponent {
     }
 }
 
-function chooseTypeface(data) {
-    const TYPEFACES = [{
-        name: 'Cormorant',
-        value: [2, -2, -2],
-    }, {
-        name: 'Merriweather',
-        value: [-2, 2, -2],
-    }, {
-        name: 'Playfair Display',
-        value: [-2, -2, 2],
-    }, {
-        name: 'PT Serif',
-        value: [2, 2, -2],
-    }, {
-        name: 'Poppins',
-        value: [-2, 2, 2],
-    }, {
-        name: 'Libre Baskerville',
-        value: [2, -2, 2],
-    }, {
-        name: 'Arvo',
-        value: [-2, -2, -2],
-    }, {
-        name: 'Open Sans',
-        value: [1, 2, -2],
-    }];
-
-    let min = Infinity;
-    let closest = TYPEFACES[0].name;
-    const dataValue = [
-        data.friendlyAuthority,
-        data.classicModern,
-        data.seriousPlayful
-    ];
-    for (const {name, value} of TYPEFACES) {
-        const distance = Math.pow(dataValue[0] - value[0], 2)
-            + Math.pow(dataValue[1] - value[1], 2)
-            + Math.pow(dataValue[2] - value[2], 2);
-        if (distance < min) {
-            closest = name;
-            min = distance;
-        }
-    }
-
-    return closest;
-}
-
 function generateGuideCSS(data) {
-    const typeface = chooseTypeface(data);
-
     return `
-    @import url('https://fonts.googleapis.com/css?family=${typeface.replace(' ', '+')}&display=swap');
     body {
-       --color-primary: ${data.base};
-       --color-secondary: ${data.base};
-       --color-tertiary: ${data.base};
-       --font-primary: ${typeface};
-       --font-secondary: ${typeface}
-    }
-    .typeface-primary-name::after {
-        content: '${typeface}';
-    }
-    .typeface-secondary-name::after {
-        content: '${typeface}';
-    }
-    .color-primary-hex::after {
-        content: '${data.base}';
+        background: ${data.base};
     }
     `;
 }
 
 class PreviewPane extends StyledComponent {
     init(record) {
-        this.lastStyles = '';
-
         this.bind(record, data => this.render(data));
     }
     updateGuideCSS() {
@@ -369,9 +216,6 @@ class PreviewPane extends StyledComponent {
 
         const stylesheet = generateGuideCSS(this.record.summarize());
         // TODO: diff and quit if same
-        if (stylesheet === this.lastStyles) {
-            return;
-        }
         const doc = this.node.querySelector('iframe').contentDocument;
         if (!doc) {
             return;
@@ -387,26 +231,12 @@ class PreviewPane extends StyledComponent {
             doc.head.removeChild(prev);
         }
         doc.head.appendChild(linkTag);
-
-        this.lastStyles = stylesheet;
-    }
-    styles() {
-        return css`
-        box-sizing: border-box;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-
-        .guide-frame {
-            width: 100%;
-            height: 100%;
-        }
-        `;
     }
     compose(data) {
         this.updateGuideCSS();
         return jdom`<div class="previewPaneInner">
-            <iframe class="guide-frame" src="/guide" frameborder="0"></iframe>
+            preview ${JSON.stringify(data)}
+            <iframe src="/guide" frameborder="0"></iframe>
         </div>`;
     }
 }
@@ -445,35 +275,10 @@ class App extends StyledComponent {
         });
     }
 
-    styles() {
-        return css`
-        background: #eee;
-        height: 100vh;
-        width: 100vw;
-        display: flex;
-        flex-direction: row;
-
-        .half {
-            width: 100%;
-        }
-        .controlsPane {
-            max-width: 600px;
-            flex-grow: 1;
-        }
-        .previewPane {
-            flex-grow: 1,
-        }
-        @media only print {
-            .controlsPane {
-                display: none;
-            }
-        }
-        `;
-    }
-
     compose() {
         // TODO: remove refreshBtn eventually
         return jdom`<div class="app">
+            <a href="/" class="refreshBtn">refresh (dev)</a>
             <div class="controlsPane half">
                 ${this.controls.node}
             </div>

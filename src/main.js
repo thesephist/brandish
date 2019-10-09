@@ -24,6 +24,17 @@ function respondWithIndex(req, res) {
 app.get('/', respondWithIndex);
 app.get('/:guideKey/colors/:base/:secondary/:tertiary', respondWithIndex);
 
+app.get('/guide', (req, res) => {
+    fs.readFile('static/guide.html', 'utf8', (err, data) => {
+        if (err) {
+            throw err;
+        }
+
+        res.set('Content-Type', 'text/html');
+        res.send(data);
+    });
+})
+
 app.use('/static', express.static('static'));
 
 app.listen(
