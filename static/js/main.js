@@ -349,28 +349,79 @@ class ControlsPane extends StyledComponent {
 function chooseTypeface(data) {
     const TYPEFACES = [{
         name: 'Cormorant',
-        value: [2, -2, -2],
-    }, {
-        name: 'Merriweather',
-        value: [-2, 2, -2],
-    }, {
-        name: 'Playfair Display',
-        value: [-2, -2, 2],
-    }, {
-        name: 'PT Serif',
-        value: [2, 2, -2],
-    }, {
-        name: 'Poppins',
-        value: [-2, 2, 2],
+        value: [2, -2, -],
     }, {
         name: 'Libre Baskerville',
-        value: [2, -2, 2],
+        value: [-1.2, 2, -2],
     }, {
         name: 'Arvo',
-        value: [-2, -2, -2],
+        value: [1.2, 1.2, 0],
+    }, {
+        name: 'Roboto',
+        value: [.4, .8, 0],
     }, {
         name: 'Open Sans',
-        value: [1, 2, -2],
+        value: [.8, .4, -.4],
+    }, {
+        name: 'Lato',
+        value: [-.4, .4, 0],
+    }, {
+        name: 'Be Vietnam',
+        value: [1.6, -.8, 1.2],
+    }, {
+        name: 'Montserrat',
+        value: [1.2, .4, -.4],
+    }, {
+        name: 'Hepta Slab',
+        value: [-.8, .8, .8],
+    }, {
+        name: 'Source Sans Pro',
+        value: [0, 0, .4],
+    }, {
+        name: 'Oswald',
+        value: [-.8, 1.2, .4],
+    }, {
+        name: 'Raleway',
+        value: [1.2, -.4, .8],
+    }, {
+        name: 'Merriweather',
+        value: [.4, 1.6, -.8],
+    }, {
+        name: 'Poppins',
+        value: [1.2, .8, -.4],
+    }, {
+        name: 'Big Shoulders Display',
+        value: [2, 1.2, -.4],
+    }, {
+        name: 'Ubuntu',
+        value: [1.2, -.4, 0],
+    }, {
+        name: 'Playfair Display',
+        value: [-1.6, 1.2, .4],
+    }, {
+        name: 'PT Serif',
+        value: [-2, 2, -1.2],
+    }, {
+        name: 'Lora',
+        value: [-1.6, 2, -1.2],
+    }, {
+        name: 'Nunito',
+        value: [2, -1.6, 1.6],
+    }, {
+        name: 'Quicksand',
+        value: [2, -.8, 1.2],
+    }, {
+        name: 'Dosis',
+        value: [.8, -2, .4],
+    }, {
+        name: 'Josefin Sans',
+        value: [2, -1.2, 1.2],
+    }, {
+        name: 'Comfortaa',
+        value: [2, -2, 2],
+    }, {
+        name: 'Abril Fatface',
+        value: [-.4, 2, .8],
     }];
 
     let min = Infinity;
