@@ -349,7 +349,7 @@ class ControlsPane extends StyledComponent {
 function chooseTypeface(data) {
     const TYPEFACES = [{
         name: 'Cormorant',
-        value: [2, -2, -],
+        value: [2, -2, -1.2],
     }, {
         name: 'Libre Baskerville',
         value: [-1.2, 2, -2],
