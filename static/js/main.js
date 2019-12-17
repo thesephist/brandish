@@ -9,7 +9,6 @@ function encodeGuideKey({
     classicModern = 0,
     seriousPlayful = 0,
 }) {
-    // TODO: improve this to generate prettier slugs
     return `${friendlyAuthority + 2}${classicModern + 2}${seriousPlayful + 2}`
 };
 
@@ -39,6 +38,7 @@ class RangeSlider extends StyledComponent {
         this.rightLabel = rightLabel;
         this.name = name;
 
+        this.handleClick = this.handleClick.bind(this);
         this.onHandleDown = this.onHandleDown.bind(this);
         this.onHandleUp = this.onHandleUp.bind(this);
         this.onHandleMove = this.onHandleMove.bind(this);
@@ -54,7 +54,15 @@ class RangeSlider extends StyledComponent {
         return this.record.data[this.name];
     }
     handleClick(evt) {
-        // TODO: handle click anywhere in the bar.
+        evt.preventDefault();
+
+        const x = evt.clientX || evt.touches[0].clientX || 0;
+        const {left, right, width} = this.node.querySelector('.slider')
+            .getBoundingClientRect();
+
+        this.incrementX = width / 5;
+        const middle = (left + right) / 2;
+        this.record.update({[this.name]: ~~((x - middle) / this.incrementX)});
     }
     onHandleDown(evt) {
         evt.preventDefault();
@@ -147,7 +155,7 @@ class RangeSlider extends StyledComponent {
     compose(data) {
         const pct = (this.value() + 2) * 25;
 
-        return jdom`<div class="rangeSlider">
+        return jdom`<div class="rangeSlider" onclick="${this.handleClick}">
             <div class="labels">
                 <div class="label left">${this.leftLabel}</div>
                 <div class="label right">${this.rightLabel}</div>
