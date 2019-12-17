@@ -117,11 +117,12 @@ class RangeSlider extends StyledComponent {
             width: 16px;
             border-radius: 8px;
             box-shadow: 0 3px 6px -1px rgba(0, 0, 0, .3);
-            transition: transform .2s;
+            transition: transform .2s, left .2s;
             transform: scale(1.4);
 
-            &:hover {
-                transform: scale(1.5);
+            &:hover,
+            &:active {
+                transform: scale(1.8);
             }
             &:active {
                 cursor: grabbing;
@@ -143,7 +144,6 @@ class RangeSlider extends StyledComponent {
         }
         `;
     }
-    // TODO: probably have a hidden label + input here for a11y
     compose(data) {
         const pct = (this.value() + 2) * 25;
 
@@ -190,6 +190,7 @@ class ColorSwatch extends StyledComponent {
         transition: transform .3s;
         transform: none;
         position: relative;
+        text-shadow: 0 2px 3px rgba(0, 0, 0, .3);
 
         color: var(--fore);
         line-height: 64px;
@@ -231,7 +232,7 @@ class ColorSwatch extends StyledComponent {
             ${this.editable ? jdom`<input type="color" oninput="${evt => {
                 this.color = evt.target.value;
                 this.record.update({
-                    base: this.color.substr(1),
+                    base: this.color.substr(1), // assume hex color format
                 });
             }}"/>` : null}
             ${this.editable ? 'edit' : null}
@@ -444,15 +445,31 @@ function chooseTypeface(data) {
     return closest;
 }
 
+function generateComplementaryColorSet(baseColor) {
+    if (baseColor.length === 3) {
+        baseColor = baseColor[0] + baseColor[0]
+            + baseColor[1] + baseColor[1]
+            + baseColor[2] + baseColor[2];
+    }
+    const baseHex = parseInt(baseColor, 16);
+    const complement = (0xffffff ^ baseHex).toString(16);
+    return {
+        primary: baseColor,
+        secondary: complement,
+        tertiary: baseColor,
+    }
+}
+
 function generateGuideCSS(data) {
     const typeface = chooseTypeface(data);
+    const { primary, secondary, tertiary } = generateComplementaryColorSet(data.base);
 
     return `
     @import url('https://fonts.googleapis.com/css?family=${typeface.replace(' ', '+')}&display=swap');
     body {
-       --color-primary: #${data.base};
-       --color-secondary: #${data.base};
-       --color-tertiary: #${data.base};
+       --color-primary: #${primary};
+       --color-secondary: #${secondary};
+       --color-tertiary: #${tertiary};
        --font-primary: ${typeface};
        --font-secondary: ${typeface}
     }
@@ -483,7 +500,6 @@ class PreviewPane extends StyledComponent {
         }
 
         const stylesheet = generateGuideCSS(this.record.summarize());
-        // TODO: diff and quit if same
         if (stylesheet === this.lastStyles) {
             return;
         }
