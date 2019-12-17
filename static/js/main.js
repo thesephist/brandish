@@ -483,7 +483,13 @@ function generateGuideCSS(data) {
         content: '${typeface}';
     }
     .color-primary-hex::after {
-        content: '${data.base}';
+        content: '${primary}';
+    }
+    .color-secondary-hex::after {
+        content: '${secondary}';
+    }
+    .color-tertiary-hex::after {
+        content: '${tertiary}';
     }
     `;
 }
@@ -611,7 +617,6 @@ class App extends StyledComponent {
     }
 
     compose() {
-        // TODO: remove refreshBtn eventually
         return jdom`<div class="app">
             <div class="controlsPane half">
                 ${this.controls.node}

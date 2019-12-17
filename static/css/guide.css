@@ -65,6 +65,7 @@ h2,
 h3,
 h4 {
     font-family: var(--font-primary);
+    margin-bottom: 12px;
 }
 
 .typeface-secondary,
@@ -75,10 +76,17 @@ figcaption {
 }
 
 .color-band {
-    height: 24px;
+    height: 50px;
     width: 100%;
     display: flex;
     flex-direction: row;
+    margin-bottom: 50px;
+}
+
+.color-primary-hex,
+.color-secondary-hex,
+.color-tertiary-hex {
+    margin-top: 8px;
 }
 
 .color-block {
@@ -87,7 +95,7 @@ figcaption {
 }
 
 .color-block .swatch {
-    height: 24px;
+    height: 100%;
     width: 100%;
 }
 
