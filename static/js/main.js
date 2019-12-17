@@ -451,25 +451,20 @@ function generateComplementaryColorSet(baseColor) {
             + baseColor[1] + baseColor[1]
             + baseColor[2] + baseColor[2];
     }
-    const baseHex = parseInt(baseColor, 16);
-    const complement = (0xffffff ^ baseHex).toString(16);
-    return {
-        primary: baseColor,
-        secondary: complement,
-        tertiary: baseColor,
-    }
+    const [primary, secondary, tertiary] = $ui.color.triadic('#' + baseColor);
+    return {primary, secondary, tertiary};
 }
 
 function generateGuideCSS(data) {
     const typeface = chooseTypeface(data);
-    const { primary, secondary, tertiary } = generateComplementaryColorSet(data.base);
+    const {primary, secondary, tertiary} = generateComplementaryColorSet(data.base);
 
     return `
     @import url('https://fonts.googleapis.com/css?family=${typeface.replace(' ', '+')}&display=swap');
     body {
-       --color-primary: #${primary};
-       --color-secondary: #${secondary};
-       --color-tertiary: #${tertiary};
+       --color-primary: ${primary};
+       --color-secondary: ${secondary};
+       --color-tertiary: ${tertiary};
        --font-primary: ${typeface};
        --font-secondary: ${typeface}
     }
